@@ -66,15 +66,79 @@ def tags_to_dictionary(tag_product_table):
 
     return tag_data
 
+"""
+NEEDS COMMENT
+"""
 def pull_all_categories():
     
     category_data = Category.objects.values_list('category_name', flat=True)
     
     return category_data
 
-
+"""
+NEEDS COMMENT
+"""
 def pull_all_tags():
 
     tag_data = Tag.objects.values_list('tag_name', flat=True)
 
     return tag_data
+
+"""
+this function takes in the product_table, the currently selected tag_filter, and the table of tags. It filters
+the product table based on the selected tag filter and returns the updated product_table
+"""
+def filter_by_tag(product_table, tag_filter, just_tags):
+    # check to see if the selected filter is a tag
+    if tag_filter in just_tags:
+        """
+        In order to filter our products by tags and display them correctly:
+
+        1. find all product_ids that use the selected tag filter
+        2. filter the product_table to contain only the product_ids found in step 1
+        """
+
+        """
+        this query selects the matching Tag object from the Tag table with the applied filter name. This is
+        assigned to a variable that we can manipulate to grab its corresponding id
+        """
+        tag_name = Tag.objects.get(tag_name = tag_filter)
+
+        """
+        this queries the TagProductRelationship and filters it to only contain products that match our selected
+        filter and its corresponding tag_id.
+        """
+        selected_products = TagProductRelationship.objects.filter(tag_id = tag_name.id)
+
+        # pull all product_ids from the new table of selected_products and store them in an array
+        products = []
+        for product in selected_products:
+            products.append(product.product_id)
+
+        """
+        this query filters the product table based on our array of product_ids
+        """
+        product_table = product_table.filter(id__in = products)
+    
+    return product_table
+
+"""
+this function takes in the product_table, the currently selected category_filter, and the table of categories. It filters
+the product table based on the selected category filter and returns the updated product_table
+"""
+def filter_by_category(product_table, category_filter, categories):
+    # check to see if the selected filter is a category
+    if category_filter in categories:
+        """
+        this query selects the matching Category object with the applied filter name. This is assigned to 
+        a variable that we can manipulate to grab its corresponding id
+        """
+        category_name = Category.objects.get(category_name = category_filter)
+
+        """
+        this query filters the product_table we created earlier and filters it to contain products
+        that match the category_id of the selected category filter.
+        """
+        product_table = product_table.filter(category_id = category_name.id)
+    
+    return product_table
