@@ -1,13 +1,31 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ramarcable Project</title>
-</head>
-<body>
-    <h1>Search Database</h1>
-</body>
-</html>
+{% block content %}
+
+<p></p>
+<h1><u>All Product Database Data</u></h1>
+
+
+<!-- Table filled from database -->
+<table>
+    <tr>
+        <th>Entry</th>
+        <th>Product Name</th>
+        <th>Category</th>
+        <th>Tags</th>
+    </tr>
+    <!-- loop through the data pulled from back end sql queries to be displayed as a table -->
+    {% for column in data %}
+    <tr>
+        <td>{{column.entry}}</td>
+        <td>{{column.product_name}}</td>
+        <td>{{column.category}}</td>
+
+        <!-- utilize custom django filter to access the tag_data dictionary -->
+        <td>{{tag|dictionary_key:column.product_name}}</td>
+    </tr>
+    
+    {% endfor %}
+</table>
+
+{% endblock %}
