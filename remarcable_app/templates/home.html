@@ -2,6 +2,34 @@
 
 {% block content %}
 
+<h2><u>Sort By</u></h2>
+
+<!-- Sort by Catergories -->
+<h3>Category</h3>
+
+<form action="" method="post">
+    {%csrf_token%}
+    <input type="radio" name= "category" value="None">No Filter</input>
+    {% for category in categories %}
+    <input type="radio" name= "category" value="{{category}}">{{category}}</input>
+    {% endfor %}
+
+    <p></p>
+
+    <!-- Sort by Tags -->
+    <h3>Tags</h3>
+
+    <input type="radio" name="tag" value="None">No Filter</input>
+    {% for tag in tags %}
+    <input type="radio" name="tag" value="{{tag}}">{{tag}}</input>
+    {% endfor %}
+
+    <p></p>
+    <button type="submit">Refresh</button>
+</form>
+
+<p>{{str}}</p>
+
 <p></p>
 <h1><u>All Product Database Data</u></h1>
 
@@ -15,14 +43,14 @@
         <th>Tags</th>
     </tr>
     <!-- loop through the data pulled from back end sql queries to be displayed as a table -->
-    {% for column in data %}
+    {% for column in product_data %}
     <tr>
-        <td>{{column.entry}}</td>
+        <td>{{forloop.counter}}</td>
         <td>{{column.product_name}}</td>
         <td>{{column.category}}</td>
 
         <!-- utilize custom django filter to access the tag_data dictionary -->
-        <td>{{tag|dictionary_key:column.product_name}}</td>
+        <td>{{tag_data|dictionary_key:column.product_name}}</td>
     </tr>
     
     {% endfor %}
