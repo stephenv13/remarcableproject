@@ -142,3 +142,56 @@ def filter_by_category(product_table, category_filter, categories):
         product_table = product_table.filter(category_id = category_name.id)
     
     return product_table
+
+"""
+this function takes in a raw input_string from the search bar, splits the string into individual words,
+and then removes any empty strings. Returns a list
+"""
+def strip_search_results(input_string) -> array:
+    # splits inpout string into individual words by spaces
+    stripped_arr = input_string.split(" ")
+
+    # filters out any empty strings and stores them in a list variable
+    results = list(filter(None, stripped_arr))
+
+    return results
+
+def search_products(search_list,product_table,tag_product_table):
+    products_match = []
+    category_match = []
+    tag_match = []
+    final_tags = []
+    final_products=[]
+
+    for term in search_list:
+        temp_product = product_table.filter(product_name__icontains=term).values_list('id', flat=True)
+
+        for id in temp_product:
+            if id not in products_match:
+                # list of every matching product_id found in the products table
+                products_match.append(id)
+
+        temp_category = product_table.filter(category__category_name__icontains=term).values_list('id',flat=True)
+
+        for id in temp_category:
+            if id not in category_match:
+                # list of every matching product_id found in the products_table
+                category_match.append(id)
+
+        temp_tag = Tag.objects.filter(tag_name__icontains = term).values_list('id',flat=True)
+
+        for tag_id in temp_tag:
+            if tag_id not in tag_match:
+                tag_match.append(tag_id)
+
+        for tag_id in tag_match:
+            temp_product = tag_product_table.filter(tag_id__in = tag_match).values_list('product_id',flat=True)
+
+            for id in temp_product:
+                if id not in final_tags:
+                    final_tags.append(id)
+
+        
+        final_products = set(products_match + category_match + final_tags)
+
+    return final_products

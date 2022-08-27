@@ -31,8 +31,9 @@
     <p></p>
 
     <!-- Database search bar -->
-    <form action="" method="post">
-        <input type="text" placeholder="Enter Product Description">
+    <form action="{% url 'search_results' %}" method="post">
+        {% csrf_token %}
+        <input type="text" name="text_input" placeholder="Enter Product Description">
         <input type="submit" value="Search">
     </form>
 
