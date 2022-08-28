@@ -1,5 +1,5 @@
 from array import array
-from remarcable_app.models import Product, Category, Tag, TagProductRelationship
+from remarcable_app.models import Product, Category, Tag, TagProductRelationship, SearchHistory
 
 # this function pulls all of the products and their categories from the db
 def pull_all_products():
@@ -67,19 +67,29 @@ def tags_to_dictionary(tag_product_table):
     return tag_data
 
 """
-NEEDS COMMENT
+this function pulls all of the categories from the db and returns and flat list
+of all of the category names.
 """
 def pull_all_categories():
     
+    """
+    this queries the category table in the db, pulls every category_name and
+    stores them in a usable list
+    """
     category_data = Category.objects.values_list('category_name', flat=True)
     
     return category_data
 
 """
-NEEDS COMMENT
+this function pulls all of the tags from the tag table in the db. It returns a 
+flat list of all of tag names.
 """
 def pull_all_tags():
 
+    """
+    this queries the tag table in the db, pulls every tag_name and stores them
+    in a usable list.
+    """
     tag_data = Tag.objects.values_list('tag_name', flat=True)
 
     return tag_data
@@ -156,6 +166,11 @@ def strip_search_results(input_string) -> array:
 
     return results
 
+"""
+this function takes in a list of search terms filtered from the search bar, the INNER JOINED product_table, and
+the INNER JOINED tag_product_table. It uses the list of search terms to find matching product_ids from each table
+and returns a list of final product_ids that contain matches with the search terms list.
+"""
 def search_products(search_list,product_table,tag_product_table):
     products_match = []
     category_match = []
@@ -163,35 +178,77 @@ def search_products(search_list,product_table,tag_product_table):
     final_tags = []
     final_products=[]
 
+    # loop through each term in the seach terms list
     for term in search_list:
+        """
+        this query looks for product_names that match any number of characters in %term% and retruns a
+        flattened list of product_ids
+        """
         temp_product = product_table.filter(product_name__icontains=term).values_list('id', flat=True)
 
+        """
+        since the above variable is a list product_table objects, we must loop through and pull out each
+        id individually, check to see if that product_id is already stored, if not.. add it to a products_match list
+        """
         for id in temp_product:
             if id not in products_match:
                 # list of every matching product_id found in the products table
                 products_match.append(id)
 
+        """
+        this query looks for matching category_names that match any number of characters in %term% in the product_table
+        which is refereced by the categorys table. Similar to above, a flattened list of matching product_ids are returned.
+        """
         temp_category = product_table.filter(category__category_name__icontains=term).values_list('id',flat=True)
 
+        """
+        similar to above, the temp_category variable is a list of product_table objects, so we must loop through
+        and pull out each product_id individually, checkking for duplicates, and adding them to a category_match list
+        """
         for id in temp_category:
             if id not in category_match:
                 # list of every matching product_id found in the products_table
                 category_match.append(id)
 
+        """
+        this query looks for matching tag_names from the Tag table that match any number of characters in %term%.
+        This then returns a list of matching tag_id objects in a flattened list.
+        """
         temp_tag = Tag.objects.filter(tag_name__icontains = term).values_list('id',flat=True)
 
+        """
+        similar to above, we must loop through and pull out each tag_id invidually, checking for duplicates, and
+        appending to the tag_match list
+        """
         for tag_id in temp_tag:
             if tag_id not in tag_match:
                 tag_match.append(tag_id)
 
+        """
+        in this query, we are looping through each matching tag_id, then finding a a matching product_id with its
+        corresponding tag. We store this in a flattened list of tag_product_table objects which is then looped
+        through, checking for duplicates, and appened to a list of final matching product_ids.
+        """
         for tag_id in tag_match:
             temp_product = tag_product_table.filter(tag_id__in = tag_match).values_list('product_id',flat=True)
 
             for id in temp_product:
                 if id not in final_tags:
                     final_tags.append(id)
-
         
+        """
+        since there may be duplicate matching product_ids between products, categories, and tags.. we add them
+        all to a set() which removes any duplicates. We can use this final_products set to filter and display
+        only matching products after search.
+        """
         final_products = set(products_match + category_match + final_tags)
 
     return final_products
+
+"""
+this function pulls the oldest search stored in the SearchHistory database and deletes it.
+This is performed 10 times.
+"""
+def delete_old_searches() -> None:
+    for i in range(10):
+        SearchHistory.objects.first().delete()

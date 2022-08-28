@@ -1,6 +1,4 @@
 from django.db import models
-from django.urls import reverse
-
 
 """
 This model class will produce a table containing a pk column, product_name column, and a category fk column. The fk links each
@@ -41,10 +39,12 @@ class TagProductRelationship(models.Model):
     product = models.ForeignKey("remarcable_app.product",on_delete=models.CASCADE)
     tag = models.ForeignKey("remarcable_app.tag",on_delete=models.CASCADE)
 
+"""
+This model class will produce a table containing a pk column and a search_name column. It will store 
+a string of each latest search from the search bar.
+"""
 class SearchHistory(models.Model):
     search_name = models.CharField(max_length=50)
 
     def __str__(self) -> str:
         return self.search_name
-
-    
