@@ -1,7 +1,7 @@
 from functools import reduce
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
-from remarcable_app.models import Product, Category, Tag, TagProductRelationship
+from remarcable_app.models import Product, Category, Tag, TagProductRelationship, SearchHistory
 from remarcable_app.query_functions import (
     pull_all_products,
     pull_all_tagged_products,
@@ -66,10 +66,11 @@ def search_results(request):
 
     category_filter = 'None'
     tag_filter = 'None'
-    raw_search = ''
+    raw_search = str(SearchHistory.objects.last())
 
     if request.method == "POST" and request.POST.get('text_input') is not None:
         raw_search = request.POST.get('text_input')
+        latest_search = SearchHistory.objects.create(search_name=raw_search)
 
         if raw_search is not None:
             search_list = strip_search_results(raw_search)
@@ -82,6 +83,17 @@ def search_results(request):
         product_table = product_table.filter(id__in = final_products)
     
     else:
+
+        if raw_search is not None:
+            search_list = strip_search_results(raw_search)
+
+
+        if len(search_list) > 0:
+            final_products = search_products(search_list,product_table,tag_product_table)
+
+            
+        product_table = product_table.filter(id__in = final_products)
+
         # pull the currently selected category and tag values from the html radio button
         category_filter = request.POST.get('category')
         tag_filter = request.POST.get('tag')

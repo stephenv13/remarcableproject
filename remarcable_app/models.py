@@ -40,4 +40,11 @@ its corresponding tags.
 class TagProductRelationship(models.Model):
     product = models.ForeignKey("remarcable_app.product",on_delete=models.CASCADE)
     tag = models.ForeignKey("remarcable_app.tag",on_delete=models.CASCADE)
+
+class SearchHistory(models.Model):
+    search_name = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.search_name
+
     
