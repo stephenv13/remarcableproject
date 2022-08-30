@@ -20,7 +20,7 @@ def home(request):
     """
     we want to pull all of the tables of data we want to use first, so that they can be manipulated by filters.
     
-    NOTE: This may not scale well with a large databse, however.. It may even be slower to join an entire table,
+    NOTE: This may not scale well with a large database, however for this case.. It may even be slower to join an entire table,
     then filter in one line of code each time we need specific data VS. pulling everything once and continually
     filtering that down like shown here...
     """
@@ -62,11 +62,8 @@ def search_results(request):
      
     """
     we want to pull all of the tables of data we want to use first, so that they can be manipulated by filters.
-    
-    NOTE: This may not scale well with a large databse, however.. It may even be slower to join an entire table,
-    then filter in one line of code each time we need specific data VS. pulling everything once and continually
-    filtering that down like shown here...
     """
+    
     product_table = pull_all_products()
     tag_product_table = pull_all_tagged_products()
     categories = pull_all_categories()

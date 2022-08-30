@@ -1,7 +1,11 @@
-from array import array
 from remarcable_app.models import Product, Category, Tag, TagProductRelationship, SearchHistory
 
-# this function pulls all of the products and their categories from the db
+"""
+This function pulls all of the products and their categories from the db
+
+Inputs: None
+Returns: product_table: a QuerySet
+"""
 def pull_all_products():
     """
         this sql queries the db and performs an inner join with the Product and Category tables where the
@@ -11,8 +15,13 @@ def pull_all_products():
     
     return product_table
 
-# this function takes in an entire table of products and stores them in an array of objects
-def products_to_array(product_table):
+"""
+This function takes in an entire table of products and stores them in an array of objects
+
+Inputs: product_table: a QuerySet
+Returns: data: a list
+"""
+def products_to_array(product_table) -> list:
     data = []
 
     # take in each row from the new table and parse each column to be stored in the data array
@@ -28,7 +37,13 @@ def products_to_array(product_table):
         })
     return data
 
-# this function pulls all of the product names and their correspondig tags from the db and stores them in a dictionary.
+"""
+This function pulls all of the product names and their correspondig tags from the db and
+stores them in a dictionary.
+
+Inputs: None
+Returns: tag_table: a dictionary
+"""
 def pull_all_tagged_products() -> dict:
 
     """
@@ -40,8 +55,13 @@ def pull_all_tagged_products() -> dict:
     return tag_table
     
     
-# this fucntion takes in an entire table of products and their corresponding tags and parses them to a dictionary
-def tags_to_dictionary(tag_product_table):
+"""
+This fucntion takes in an entire table of products and their corresponding tags and parses them to a dictionary
+
+Inputs: tag_product_table: a QuerySet
+Returns: tag_data: a dictionary
+"""
+def tags_to_dictionary(tag_product_table) -> dict:
     tag_data = {}
 
     """
@@ -66,9 +86,13 @@ def tags_to_dictionary(tag_product_table):
 
     return tag_data
 
+
 """
 this function pulls all of the categories from the db and returns and flat list
 of all of the category names.
+
+Inputs: None
+Returns: category_data: a flattened list QuerySet
 """
 def pull_all_categories():
     
@@ -77,12 +101,15 @@ def pull_all_categories():
     stores them in a usable list
     """
     category_data = Category.objects.values_list('category_name', flat=True)
-    
+
     return category_data
 
 """
 this function pulls all of the tags from the tag table in the db. It returns a 
 flat list of all of tag names.
+
+Inputs: None
+Returns: tag_data: a flattened list QuerySet
 """
 def pull_all_tags():
 
@@ -97,6 +124,9 @@ def pull_all_tags():
 """
 this function takes in the product_table, the currently selected tag_filter, and the table of tags. It filters
 the product table based on the selected tag filter and returns the updated product_table
+
+Inputs: product_table: a QuerySet, tag_filter: a Str, just_tags: a QuerySet
+Returns: product_table: a QuerySet
 """
 def filter_by_tag(product_table, tag_filter, just_tags):
     # check to see if the selected filter is a tag
@@ -135,6 +165,9 @@ def filter_by_tag(product_table, tag_filter, just_tags):
 """
 this function takes in the product_table, the currently selected category_filter, and the table of categories. It filters
 the product table based on the selected category filter and returns the updated product_table
+
+Inputs: product_table: a QuerySet, category_filter: a Str, categories: a QuerySet
+Returns: product_table: a QuerySet
 """
 def filter_by_category(product_table, category_filter, categories):
     # check to see if the selected filter is a category
@@ -156,8 +189,11 @@ def filter_by_category(product_table, category_filter, categories):
 """
 this function takes in a raw input_string from the search bar, splits the string into individual words,
 and then removes any empty strings. Returns a list
+
+Inputs: input_string: a Str
+Returns: results: a list
 """
-def strip_search_results(input_string) -> array:
+def strip_search_results(input_string: str) -> list:
     # splits inpout string into individual words by spaces
     stripped_arr = input_string.split(" ")
 
@@ -170,8 +206,11 @@ def strip_search_results(input_string) -> array:
 this function takes in a list of search terms filtered from the search bar, the INNER JOINED product_table, and
 the INNER JOINED tag_product_table. It uses the list of search terms to find matching product_ids from each table
 and returns a list of final product_ids that contain matches with the search terms list.
+
+Inputs: search_list: a list, product_table: a QuerySet, tag_product_table: a QuerySet
+Returns: final_products: a list
 """
-def search_products(search_list,product_table,tag_product_table):
+def search_products(search_list: list,product_table,tag_product_table) -> list:
     products_match = []
     category_match = []
     tag_match = []
@@ -248,6 +287,9 @@ def search_products(search_list,product_table,tag_product_table):
 """
 this function pulls the oldest search stored in the SearchHistory database and deletes it.
 This is performed 10 times.
+
+Inputs: None
+Returns: None
 """
 def delete_old_searches() -> None:
     for i in range(10):
